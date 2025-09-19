@@ -1,4 +1,3 @@
-/* Фон на ВЕСЬ экран, без белой полосы */
 html, body {
   margin: 0;
   padding: 0;
@@ -6,13 +5,12 @@ html, body {
 }
 
 html {
-  /* вешаем фон на html, тогда он точно покрывает всё */
   background: #000 url('img/fon.webp') center center / cover no-repeat fixed;
 }
 
 body {
-  min-height: 100vh;     /* тянем тело на высоту окна */
-  background: transparent;/* тело прозрачное, фон у html */
+  background: transparent;
   color: #fff;
   font-family: Arial, sans-serif;
+  min-height: 100vh;
 }
