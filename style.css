@@ -1,9 +1,18 @@
-body {
+html, body {
   margin: 0;
+  height: 100%; /* растягиваем на всю высоту окна */
+}
+
+body {
   font-family: Arial, sans-serif;
   background-image: url('img/fon.webp');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  color: #fff; /* текст читается на тёмном фоне */
+  color: #fff; /* белый текст */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* центрируем по горизонтали */
+  justify-content: center; /* центрируем по вертикали */
+  text-align: center;
 }
