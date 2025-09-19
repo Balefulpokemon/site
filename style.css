@@ -5,7 +5,7 @@ html, body {
 }
 
 html {
-  background: #000 url('img/fon.webp') center center / cover no-repeat fixed;
+  background: #000 url('img/fon1.webp') center center / cover no-repeat fixed;
 }
 
 body {
@@ -14,3 +14,4 @@ body {
   font-family: Arial, sans-serif;
   min-height: 100vh;
 }
+
