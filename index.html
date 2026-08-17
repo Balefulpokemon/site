@@ -1,12 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Portfolio</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Globe Grid</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            font-family: monospace;
+            color: #fff;
+        }
+        #globe-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .ui-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .status-badge {
+            background: rgba(0, 0, 0, 0.85);
+            border: 1px solid #00ffcc;
+            padding: 10px 15px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #00ffcc;
+            box-shadow: 0 0 10px rgba(0, 255, 204, 0.2);
+        }
+    </style>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <p>This is my dark theme site.</p>
+    <div class="ui-overlay">
+        <div class="status-badge">Custom Grid Matrix Active</div>
+    </div>
+    <div id="globe-container"></div>
+
+    <script src="//unpkg.com/three"></script>
+    <script src="//unpkg.com/globe.gl"></script>
+    <script>
+        const globe = Globe()
+            (document.getElementById('globe-container'))
+            .globeImageUrl('https://raw.githubusercontent.com/Balefulpokemon/site/cd1313a2216c55a4a0aed25cdde1a7d694d3ab3a/img/sweet3.png')
+            .globeCurvatureResolution(1) // Увеличиваем плотность полигонов сферы, чтобы линии не ломались
+            .backgroundColor('#000000')
+            .showAtmosphere(true)
+            .atmosphereColor('#00ffcc')
+            .atmosphereAltitude(0.2)
+            .pointsData([])
+            .pointAltitude(0.02)
+            .pointColor(() => '#00ffcc')
+            .pointRadius(0.8);
+
+        globe.onGlobeReady(() => {
+            const globeMaterial = globe.globeMaterial();
+            if (globeMaterial && globeMaterial.map) {
+                globeMaterial.map.minFilter = THREE.LinearFilter;
+                globeMaterial.map.magFilter = THREE.LinearFilter;
+                globeMaterial.map.generateMipmaps = false;
+                globeMaterial.map.needsUpdate = true;
+            }
+        });
+
+        const radius = globe.getGlobeRadius() * 1.002;
+        const material = new THREE.LineBasicMaterial({
+            color: 0x00ffcc,
+            transparent: true,
+            opacity: 0.35
+        });
+
+        const group = new THREE.Group();
+
+        for (let lng = 0; lng < 360; lng += 15) {
+            const points = [];
+            for (let lat = -90; lat <= 90; lat += 2) {
+                const phi = (90 - lat) * (Math.PI / 180);
+                const theta = (lng + 180) * (Math.PI / 180);
+                points.push(new THREE.Vector3(
+                    -radius * Math.sin(phi) * Math.cos(theta),
+                    radius * Math.cos(phi),
+                    radius * Math.sin(phi) * Math.sin(theta)
+                ));
+            }
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            group.add(new THREE.Line(geometry, material));
+        }
+
+        for (let lat = -75; lat <= 75; lat += 15) {
+            if (lat === 0) continue;
+            const points = [];
+            for (let lng = 0; lng <= 360; lng += 2) {
+                const phi = (90 - lat) * (Math.PI / 180);
+                const theta = (lng + 180) * (Math.PI / 180);
+                points.push(new THREE.Vector3(
+                    -radius * Math.sin(phi) * Math.cos(theta),
+                    radius * Math.cos(phi),
+                    radius * Math.sin(phi) * Math.sin(theta)
+                ));
+            }
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            group.add(new THREE.Line(geometry, material));
+        }
+
+        globe.scene().add(group);
+
+        globe.controls().autoRotate = true;
+        globe.controls().autoRotateSpeed = 0.8;
+        globe.controls().enableZoom = true;
+
+        globe.onGlobeClick(({ lat, lng }) => {
+            globe.controls().autoRotate = false;
+            globe.pointsData([{ lat, lng }]);
+            globe.pointOfView({ lat, lng, altitude: 1.5 }, 2000);
+        });
+    </script>
 </body>
 </html>
